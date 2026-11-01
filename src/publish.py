@@ -199,7 +199,7 @@ def push(token, repo):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--token", default=os.environ.get("GITHUB_TOKEN"))
-    parser.add_argument("--repo", default="lukeyancn/ds-in-kimi")
+    parser.add_argument("--repo", default="lukeyancn/kimi-gateway")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--skip-push", action="store_true")
     args = parser.parse_args()

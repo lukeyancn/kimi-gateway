@@ -41,7 +41,7 @@ def scenario(mode):
         }
     return 200, {
         "tag_name": "v1.1.0",
-        "html_url": "https://github.com/lukeyancn/ds-in-kimi/releases/tag/v1.1.0",
+        "html_url": "https://github.com/lukeyancn/kimi-gateway/releases/tag/v1.1.0",
         "name": "v1.1.0",
         "body": "## 更新内容\n\n- 新增成本统计\n- 修复托盘重启\n",
         "assets": ASSETS,

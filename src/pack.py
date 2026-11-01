@@ -27,7 +27,7 @@ ROOT = Path(__file__).resolve().parent.parent
 DIST = ROOT / "dist"
 
 VERSION = "1.0.0"
-DEFAULT_REPO = "lukeyancn/ds-in-kimi"
+DEFAULT_REPO = "lukeyancn/kimi-gateway"
 
 NODE_CANDIDATES = [
     Path(r"C:\Program Files\nodejs\node.exe"),

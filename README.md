@@ -34,7 +34,7 @@
 检查地址来自包内的 `update.json`，改仓库不用重编译：
 
 ```json
-{ "repo": "lukeyancn/ds-in-kimi", "assetHint": "portable" }
+{ "repo": "lukeyancn/kimi-gateway", "assetHint": "portable" }
 ```
 
 `assetHint` 决定「下载安装包」优先挑哪个资产（`portable` / `share`），找不到就退到第一个 zip。

@@ -40,7 +40,7 @@ namespace KimiBridge
     internal static class Updater
     {
         // 默认仓库；包内 update.json 可以覆盖，换仓库不用重编译。
-        public const string DefaultRepo = "lukeyancn/ds-in-kimi";
+        public const string DefaultRepo = "lukeyancn/kimi-gateway";
         private const string DefaultApiBase = "https://api.github.com";
         private const int CheckTimeoutMs = 12000;
         private const int DownloadTimeoutMs = 120000;
