@@ -122,12 +122,16 @@ def upload_asset(token, upload_url, path, label=""):
 
 
 def run(cmd, **kwargs):
-    result = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True, **kwargs)
+    # git 在中文 Windows 上会输出 GBK（甚至混合编码），按字节收再自行解码，
+    # 避免 UnicodeDecodeError 把成功的命令判成失败。
+    result = subprocess.run(cmd, cwd=ROOT, capture_output=True, **kwargs)
+    stdout = (result.stdout or b"").decode("utf-8", "replace")
+    stderr = (result.stderr or b"").decode("utf-8", "replace")
     if result.returncode != 0:
-        print(result.stdout)
-        print(result.stderr)
+        print(stdout)
+        print(stderr)
         raise RuntimeError(f"命令失败：{' '.join(cmd)}")
-    return result.stdout.strip()
+    return stdout.strip()
 
 
 def git(*args):
@@ -171,11 +175,10 @@ def prepare_repo(remote_url):
     else:
         print("  工作区干净，跳过提交")
 
-    existing = subprocess.run(
-        ["git", "remote", "get-url", "origin"], cwd=ROOT, capture_output=True, text=True
-    )
+    existing = subprocess.run(["git", "remote", "get-url", "origin"], cwd=ROOT, capture_output=True)
     if existing.returncode == 0:
-        if existing.stdout.strip() != remote_url:
+        current = (existing.stdout or b"").decode("utf-8", "replace").strip()
+        if current != remote_url:
             git("remote", "set-url", "origin", remote_url)
     else:
         git("remote", "add", "origin", remote_url)
