@@ -26,7 +26,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 DIST = ROOT / "dist"
 
-VERSION = "1.0.0"
+VERSION = "1.1.0"
 DEFAULT_REPO = "lukeyancn/kimi-gateway"
 
 NODE_CANDIDATES = [
@@ -43,6 +43,7 @@ RUNTIME_FILES = [
     ("config.mjs", "config.mjs"),
     ("metrics.mjs", "metrics.mjs"),
     ("admin-api.mjs", "admin-api.mjs"),
+    ("kimi-env.mjs", "kimi-env.mjs"),
     ("apply-kimi-settings.mjs", "apply-kimi-settings.mjs"),
     ("config.example.json", "config.example.json"),
     ("webui/index.html", "webui/index.html"),

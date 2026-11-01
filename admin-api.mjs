@@ -14,6 +14,7 @@ import {
   normalizeBaseUrl,
   maskKey,
 } from './config.mjs';
+import * as kimiGateway from './kimi-env.mjs';
 
 const MAX_BODY = 1024 * 1024;
 const TEST_TIMEOUT = 30_000;
@@ -199,6 +200,7 @@ export function createAdminApi(options) {
       models,
       metrics: snapshot,
       sync: { pending: syncPending, lastSyncedAt, lastOutput: lastSyncOutput },
+      kimiGateway: kimiGateway.getStatus(),
       revision,
     };
   }
@@ -700,6 +702,44 @@ export function createAdminApi(options) {
     if (req.method === 'POST' && pathname === '/api/metrics/reset') {
       metrics.reset();
       sendJson(res, 200, { ok: true, state: buildState() });
+      return true;
+    }
+
+    // ---- Kimi 外接网关（BYOK）开关 ----
+    if (pathname === '/api/kimi/gateway' && req.method === 'GET') {
+      sendJson(res, 200, kimiGateway.getStatus());
+      return true;
+    }
+
+    if (pathname === '/api/kimi/gateway/enable' && req.method === 'POST') {
+      try {
+        // 提权会弹 UAC，可能等几十秒，先回一行“正在处理”再由前端轮询结果？
+        // 这里直接同步等待：UAC 一出现用户就能看到，结果一次说清更省事。
+        const result = kimiGateway.enable();
+        sendJson(res, result.ok ? 200 : 500, result);
+      } catch (err) {
+        sendJson(res, 500, { ok: false, error: err.message, status: kimiGateway.getStatus() });
+      }
+      return true;
+    }
+
+    if (pathname === '/api/kimi/gateway/disable' && req.method === 'POST') {
+      try {
+        const result = kimiGateway.disable();
+        sendJson(res, result.ok ? 200 : 500, result);
+      } catch (err) {
+        sendJson(res, 500, { ok: false, error: err.message, status: kimiGateway.getStatus() });
+      }
+      return true;
+    }
+
+    if (pathname === '/api/kimi/restart' && req.method === 'POST') {
+      try {
+        const result = kimiGateway.restartKimi();
+        sendJson(res, result.ok ? 200 : 500, result);
+      } catch (err) {
+        sendJson(res, 500, { ok: false, error: err.message });
+      }
       return true;
     }
 

@@ -27,7 +27,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 DIST = ROOT / "dist"
 
-VERSION = "1.0.0"
+VERSION = "1.1.0"
 TAG = f"v{VERSION}"
 RELEASE_NAME = f"Kimi 模型桥 v{VERSION}"
 ASSETS = [
@@ -35,38 +35,15 @@ ASSETS = [
     f"KimiGateway-{VERSION}-share.zip",
 ]
 
-RELEASE_NOTES = f"""首个公开版本。
+NOTES_FILE = ROOT / "RELEASE_NOTES.md"
 
-## 这是什么
 
-把 DeepSeek、Qwen、GLM、OpenRouter、Ollama 等任意 OpenAI 兼容模型接进 Kimi 桌面端的「第三方模型网关」。
-本地 Node 反向代理 + 托盘 EXE + WebUI，只监听 `127.0.0.1`，各家 API Key 存在本机。
+def release_notes():
+    """优先用仓库根目录的 RELEASE_NOTES.md，方便改文案不用动代码。"""
+    if NOTES_FILE.exists():
+        return NOTES_FILE.read_text(encoding="utf-8").strip() + chr(10)
+    return "Kimi 模型桥 v" + VERSION + chr(10)
 
-## 下载哪个
-
-- **portable**（约 33 MB）：内置 Node.js，解压双击即可，目标机器无需安装任何运行时。
-- **share**（约 160 KB）：体积小，但机器上需要已安装 Node.js。
-
-两个包都不含任何密钥：首次启动自动生成空白配置，打开 WebUI 添加服务商即可。
-
-## 功能
-
-- 托盘常驻：打开控制台 / 启动 / 停止 / 重启 / 开机自启 / 查看日志 / 检查更新
-- WebUI：服务商与模型管理、从上游拉取模型、测试连通性、一键同步到 Kimi
-- 用量统计：请求数、输入输出 token、缓存命中、首字延迟、逐次调用流水
-- 检查更新：直接读本仓库的 Releases
-
-## 使用
-
-1. 解压，双击 `KimiGateway.exe`
-2. 托盘右键 → 打开控制台（`http://127.0.0.1:8787/`）
-3. 添加服务商、填 Key、拉取模型、勾选导入
-4. Kimi → 设置 → 通用 → 模型来源 → 第三方模型网关
-   Base URL 填 `http://127.0.0.1:8787/v1`，Token 随便填非空值
-5. 点「测试连接并导入模型」，重启 Kimi
-
-详细说明见包内 README。
-"""
 
 FORBIDDEN_IN_GIT = ["config.json", "metrics.json"]
 
@@ -282,7 +259,7 @@ def main():
                 "tag_name": TAG,
                 "target_commitish": "main",
                 "name": RELEASE_NAME,
-                "body": RELEASE_NOTES,
+                "body": release_notes(),
                 "draft": False,
                 "prerelease": False,
             },

@@ -26,6 +26,9 @@ backup/
 # 打包 / 测试临时文件
 _gh-mode.txt
 tmp/
+.verify/
+.test-*/
+.ps-test/
 
 # 编辑器
 .vscode/

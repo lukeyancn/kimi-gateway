@@ -1937,6 +1937,147 @@ input[type="checkbox"]:checked + .switch::after {
   }
 }
 
+/* ------------------------------------------------------------ kimi gateway */
+
+.kimi-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.kimi-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.kimi-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 13px;
+  border-radius: 11px;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+}
+
+.kimi-step.done {
+  border-color: color-mix(in srgb, var(--green) 26%, transparent);
+  background: color-mix(in srgb, var(--green) 7%, transparent);
+}
+
+.kimi-step.todo {
+  border-color: color-mix(in srgb, var(--amber) 26%, transparent);
+  background: color-mix(in srgb, var(--amber) 7%, transparent);
+}
+
+.kimi-step-icon {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  margin-top: 1px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+}
+
+.kimi-step.done .kimi-step-icon {
+  color: var(--green);
+  background: color-mix(in srgb, var(--green) 16%, transparent);
+}
+
+.kimi-step.todo .kimi-step-icon {
+  color: var(--amber);
+  background: color-mix(in srgb, var(--amber) 16%, transparent);
+}
+
+.kimi-step-icon svg {
+  width: 11px;
+  height: 11px;
+}
+
+.kimi-step-text {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.kimi-step-text strong {
+  font-size: 12.5px;
+  font-weight: 560;
+  color: var(--text);
+}
+
+.kimi-step-text span {
+  font-size: 11px;
+  color: var(--dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.kimi-step-text code {
+  color: var(--muted);
+  font-size: 10.5px;
+}
+
+.kimi-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.kimi-auto {
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.kimi-hint {
+  margin-top: 12px;
+  padding-top: 11px;
+  border-top: 1px solid var(--line);
+  font-size: 11px;
+  color: var(--dim);
+  line-height: 1.65;
+}
+
+.kimi-hint:empty {
+  display: none;
+}
+
+.kimi-hint b {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.kimi-badge.ready {
+  color: var(--green);
+  border-color: color-mix(in srgb, var(--green) 34%, transparent);
+  background: color-mix(in srgb, var(--green) 10%, transparent);
+}
+
+.kimi-badge.todo {
+  color: var(--amber);
+  border-color: color-mix(in srgb, var(--amber) 34%, transparent);
+  background: color-mix(in srgb, var(--amber) 10%, transparent);
+}
+
+@media (max-width: 720px) {
+  .kimi-body {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+  }
+  .kimi-actions .btn {
+    flex: 1 1 auto;
+  }
+  .kimi-auto {
+    margin-left: 0;
+  }
+}
+
 /* -------------------------------------------------------------- responsive */
 
 @media (max-width: 1080px) {

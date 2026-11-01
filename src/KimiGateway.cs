@@ -20,8 +20,8 @@ using System.Threading;
 using System.Windows.Forms;
 using WinTimer = System.Windows.Forms.Timer;
 
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("1.1.0.0")]
+[assembly: AssemblyFileVersion("1.1.0.0")]
 [assembly: AssemblyTitle("Kimi 模型桥")]
 [assembly: AssemblyProduct("Kimi 模型桥")]
 [assembly: AssemblyDescription("把 OpenAI 兼容模型接进 Kimi 的本地网关")]
@@ -37,7 +37,7 @@ namespace KimiBridge
 
         // 版本号唯一来源：改这里，同时改程序集属性与 proxy.mjs 的 VERSION。
         // src/pack.py 会做一致性校验。
-        public const string AppVersion = "1.0.0";
+        public const string AppVersion = "1.1.0";
 
         private static readonly object Gate = new object();
         private static readonly object LogGate = new object();

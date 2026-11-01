@@ -28,8 +28,8 @@ const CONFIG_PATH = process.env.KIMI_GATEWAY_CONFIG || path.join(__dirname, 'con
 const METRICS_PATH = process.env.KIMI_GATEWAY_METRICS || path.join(__dirname, 'metrics.json');
 const LOG_PATH = process.env.KIMI_GATEWAY_LOG || path.join(__dirname, 'proxy.out.log');
 const HOST = '127.0.0.1';
-const VERSION = '1.0.0';
-const USER_AGENT = 'KimiModelBridge/1.0';
+const VERSION = '1.1.0';
+const USER_AGENT = 'KimiModelBridge/1.1';
 const STARTED_AT = Date.now();
 
 let logStream = null;

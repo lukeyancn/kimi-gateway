@@ -168,6 +168,43 @@
         </div>
       </section>
 
+      <section class="card kimi-card" id="kimiCard">
+        <header class="card-head">
+          <div class="head-text">
+            <h2>Kimi 外接网关</h2>
+            <p>标准版 Kimi 默认不显示这个入口，需要补齐两个条件</p>
+          </div>
+          <span class="pill subtle kimi-badge" id="kimiBadge">检查中</span>
+        </header>
+
+        <div class="kimi-body">
+          <div class="kimi-steps" id="kimiSteps"></div>
+
+          <div class="kimi-actions">
+            <button class="btn primary" id="kimiEnableBtn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                <path d="M13 3 5 13h5l-1 8 8-10h-5l1-8Z" />
+              </svg>
+              为 Kimi 启用外接网关
+            </button>
+            <button class="btn ghost" id="kimiRestartBtn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                <path d="M20 11a8 8 0 1 0-.9 4.3" />
+                <path d="M20 4v7h-7" />
+              </svg>
+              重启 Kimi
+            </button>
+            <label class="switch-row kimi-auto">
+              <input type="checkbox" id="kimiAutoSync" />
+              <span class="switch"></span>
+              同步时自动启用
+            </label>
+          </div>
+        </div>
+
+        <div class="kimi-hint" id="kimiHint"></div>
+      </section>
+
       <section class="split reverse">
         <article class="card recent-card">
           <header class="card-head">

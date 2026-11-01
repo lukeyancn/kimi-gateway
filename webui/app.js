@@ -15,6 +15,7 @@
     tests: {},
     seen: new Set(),
     providerSig: '',
+    kimiSig: '',
     modelsSig: '',
     chartMeta: null,
     hover: null,
@@ -815,6 +816,124 @@
     $('#chartTotal').textContent = `区间合计 ${fmtTokens(sum)} tokens`;
   }
 
+  /* ------------------------------------------------------- kimi 外接网关 */
+
+  const CHECK_ICON =
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></svg>';
+  const DOT_ICON =
+    '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="5"/></svg>';
+
+  function renderKimiGateway() {
+    const info = state.data?.kimiGateway;
+    const badge = $('#kimiBadge');
+    const stepsEl = $('#kimiSteps');
+    const enableBtn = $('#kimiEnableBtn');
+    const restartBtn = $('#kimiRestartBtn');
+    const hint = $('#kimiHint');
+    if (!info || !badge || !stepsEl) return;
+
+    const signature = JSON.stringify([info.ready, info.steps, info.kimi.running, info.kimi.pids.length]);
+    if (signature === state.kimiSig) return;
+    state.kimiSig = signature;
+
+    badge.textContent = info.ready ? '已启用' : '未启用';
+    badge.className = `pill subtle kimi-badge ${info.ready ? 'ready' : 'todo'}`;
+
+    stepsEl.innerHTML = info.steps
+      .map(
+        (step) => `<div class="kimi-step ${step.done ? 'done' : 'todo'}">
+          <span class="kimi-step-icon">${step.done ? CHECK_ICON : DOT_ICON}</span>
+          <div class="kimi-step-text">
+            <strong>${esc(step.label)}</strong>
+            <span>${esc(step.detail)}</span>
+          </div>
+        </div>`,
+      )
+      .join('');
+
+    if (enableBtn) {
+      enableBtn.innerHTML = info.ready
+        ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>恢复隐藏入口`
+        : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M13 3 5 13h5l-1 8 8-10h-5l1-8Z"/></svg>为 Kimi 启用外接网关`;
+      enableBtn.classList.toggle('primary', !info.ready);
+      enableBtn.classList.toggle('ghost', info.ready);
+    }
+
+    if (restartBtn) {
+      restartBtn.disabled = !info.kimi.running;
+      restartBtn.title = info.kimi.running
+        ? `当前 ${info.kimi.pids.length} 个 Kimi 进程，重启后生效`
+        : 'Kimi 没有在运行';
+    }
+
+    if (hint) {
+      const parts = [];
+      if (info.ready) {
+        parts.push('入口已开启。Kimi 设置 → 通用 → 模型来源 里应能看到「第三方模型网关」。');
+      } else {
+        parts.push('启用会写入 <b>byok-availability.json</b> 并向 hosts 添加 <code>192.168.1.1 dev.msh.team</code>（Kimi 用它判断在内网，不会真的连接）。');
+        parts.push('修改 hosts 需要管理员权限，会弹一次 UAC。');
+      }
+      if (info.ready && !info.kimi.running) parts.push('Kimi 当前没有运行。');
+      hint.innerHTML = parts.join(' ');
+    }
+  }
+
+  function setKimiBusy(busy) {
+    ['#kimiEnableBtn', '#kimiRestartBtn'].forEach((sel) => {
+      const el = $(sel);
+      if (el) el.disabled = busy || (sel === '#kimiRestartBtn' && !state.data?.kimiGateway?.kimi?.running);
+    });
+  }
+
+  async function toggleKimiGateway(button) {
+    const info = state.data?.kimiGateway;
+    if (!info) return;
+    const action = info.ready ? 'disable' : 'enable';
+    setKimiBusy(true);
+    button.classList.add('loading');
+    try {
+      const result = await api(`/api/kimi/gateway/${action}`, { method: 'POST' });
+      state.kimiSig = '';
+      if (result.status) {
+        state.data.kimiGateway = result.status;
+      }
+      renderKimiGateway();
+      if (result.ok) {
+        toast(
+          action === 'enable' ? '已启用外接网关' : '已恢复隐藏入口',
+          result.notes?.join(' · ') || '',
+        );
+      }
+    } catch (err) {
+      state.kimiSig = '';
+      toast('操作失败', err.message, 'error');
+      refresh();
+    } finally {
+      button.classList.remove('loading');
+      setKimiBusy(false);
+    }
+  }
+
+  function restartKimi(button) {
+    confirmDialog({
+      title: '重启 Kimi？',
+      message: '会关闭当前所有 Kimi 窗口再重新打开，未发送的草稿可能丢失。',
+      confirmText: '重启',
+      onConfirm: async () => {
+        button.classList.add('loading');
+        try {
+          const result = await api('/api/kimi/restart', { method: 'POST' });
+          toast('Kimi 正在重启', result.exe || '');
+        } catch (err) {
+          toast('重启失败', err.message, 'error');
+        } finally {
+          button.classList.remove('loading');
+        }
+      },
+    });
+  }
+
   function render() {
     const data = state.data;
     if (!data) return;
@@ -826,6 +945,7 @@
     renderModels();
     renderRequests();
     renderGateway();
+    renderKimiGateway();
     renderBanner();
     renderFoot();
   }
@@ -1591,10 +1711,29 @@
     });
   }
 
+  // 同步前确保入口已开启（仅在用户勾了「同步时自动启用」时）。
+  // 失败不阻断同步：模型清单照样写回去，入口稍后还能手动开。
+  async function ensureKimiGateway() {
+    const auto = $('#kimiAutoSync');
+    if (!auto || !auto.checked) return null;
+    const info = state.data?.kimiGateway;
+    if (!info || info.ready) return null;
+    try {
+      const result = await api('/api/kimi/gateway/enable', { method: 'POST' });
+      state.kimiSig = '';
+      if (result.status) state.data.kimiGateway = result.status;
+      renderKimiGateway();
+      return result.ok ? '已自动启用外接网关' : null;
+    } catch {
+      return null;
+    }
+  }
+
   async function runSync(button) {
     if (!button) return;
     button.classList.add('loading');
     try {
+      const enabled = await ensureKimiGateway();
       const result = await api('/api/sync', { method: 'POST' });
       applyState(result.state);
       const first = String(result.output || '')
@@ -1602,7 +1741,8 @@
         .filter(Boolean)
         .slice(0, 2)
         .join(' · ');
-      toast('已同步到 Kimi', first || '重启 Kimi 后生效');
+      const detail = [enabled, first].filter(Boolean).join(' · ');
+      toast('已同步到 Kimi', detail || '重启 Kimi 后生效');
     } catch (err) {
       toast('同步失败', err.message, 'error');
     } finally {
@@ -1694,6 +1834,25 @@
       toast(ok ? '已复制 Base URL' : '复制失败', base);
     }
   });
+
+  // ---- Kimi 外接网关 ----
+  const kimiAuto = $('#kimiAutoSync');
+  if (kimiAuto) {
+    kimiAuto.checked = localStorage.getItem('kimi.autoEnable') === '1';
+    kimiAuto.addEventListener('change', () => {
+      localStorage.setItem('kimi.autoEnable', kimiAuto.checked ? '1' : '0');
+      toast(
+        kimiAuto.checked ? '已开启自动启用' : '已关闭自动启用',
+        kimiAuto.checked ? '点「同步到 Kimi」时会先补齐入口条件' : '',
+      );
+    });
+  }
+
+  const kimiEnable = $('#kimiEnableBtn');
+  if (kimiEnable) kimiEnable.addEventListener('click', () => toggleKimiGateway(kimiEnable));
+
+  const kimiRestart = $('#kimiRestartBtn');
+  if (kimiRestart) kimiRestart.addEventListener('click', () => restartKimi(kimiRestart));
 
   $('#themeBtn').addEventListener('click', () => {
     state.theme = state.theme === 'dark' ? 'light' : 'dark';
