@@ -1,0 +1,76 @@
+{
+  "port": 8787,
+  "providers": [
+    {
+      "id": "deepseek",
+      "name": "DeepSeek",
+      "protocol": "responses",
+      "baseUrl": "https://api.deepseek.com/v1",
+      "apiKeyEnv": "DEEPSEEK_API_KEY",
+      "effortMap": {
+        "minimal": "low",
+        "low": "low",
+        "medium": "high",
+        "high": "high",
+        "xhigh": "high",
+        "max": "max"
+      },
+      "models": [
+        {
+          "id": "deepseek-flash",
+          "exposedId": "gpt-deepseek-flash",
+          "displayName": "DeepSeek V4.1 Flash",
+          "contextLength": 1000000,
+          "maxOutputTokens": 16384,
+          "vision": true,
+          "toolUse": true,
+          "reasoning": true,
+          "efforts": ["low", "high", "max"],
+          "defaultEffort": "high"
+        }
+      ]
+    },
+    {
+      "id": "qwen",
+      "name": "Qwen (DashScope)",
+      "protocol": "chat",
+      "baseUrl": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "apiKeyEnv": "DASHSCOPE_API_KEY",
+      "models": [
+        {
+          "id": "qwen3-max",
+          "exposedId": "kimi-qwen3-max",
+          "displayName": "Qwen3 Max",
+          "contextLength": 262144,
+          "maxOutputTokens": 32768,
+          "vision": false,
+          "toolUse": true,
+          "reasoning": true,
+          "efforts": ["low", "high", "max"],
+          "defaultEffort": "high"
+        }
+      ]
+    },
+    {
+      "id": "ollama",
+      "name": "Ollama (local)",
+      "protocol": "chat",
+      "baseUrl": "http://127.0.0.1:11434/v1",
+      "apiKey": "ollama",
+      "models": [
+        {
+          "id": "qwen3:8b",
+          "exposedId": "kimi-ollama-qwen3-8b",
+          "displayName": "Qwen3 8B (Ollama)",
+          "contextLength": 32768,
+          "maxOutputTokens": 8192,
+          "vision": false,
+          "toolUse": true,
+          "reasoning": false,
+          "efforts": [],
+          "defaultEffort": ""
+        }
+      ]
+    }
+  ]
+}

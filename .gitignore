@@ -1,0 +1,41 @@
+# 本地配置与密钥 —— 绝不能进公开仓库
+config.json
+*.bak
+*.bak-*
+
+# 运行时产物
+metrics.json
+proxy.out.log
+proxy.err.log
+proxy.test.*.log
+tray.log
+selftest.log
+probe.log
+update-check.log
+render-update.log
+*.log
+
+# 构建与分发包（走 Release，不进仓库）
+build/
+dist/
+*.exe
+
+# 旧启动器与旧配置备份（含明文 Key）
+backup/
+
+# 打包 / 测试临时文件
+_gh-mode.txt
+tmp/
+
+# 编辑器
+.vscode/
+.idea/
+*.swp
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# Python 缓存
+__pycache__/
+*.pyc
