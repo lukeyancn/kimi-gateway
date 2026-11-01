@@ -830,7 +830,27 @@
     const enableBtn = $('#kimiEnableBtn');
     const restartBtn = $('#kimiRestartBtn');
     const hint = $('#kimiHint');
-    if (!info || !badge || !stepsEl) return;
+    if (!badge || !stepsEl) return;
+
+    // 页面文件是每次现读的，但接口在网关进程里。刚升级完还没重启服务时，
+    // 新界面配旧接口 —— 这里明确提示，而不是一直转圈。
+    if (!info) {
+      if (state.kimiSig === '__stale__') return;
+      state.kimiSig = '__stale__';
+      badge.textContent = '需重启服务';
+      badge.className = 'pill subtle kimi-badge todo';
+      stepsEl.innerHTML = `<div class="kimi-step todo">
+        <span class="kimi-step-icon">${DOT_ICON}</span>
+        <div class="kimi-step-text">
+          <strong>网关还在跑旧版本</strong>
+          <span>界面已更新，但后台接口是启动时加载的。托盘右键 → 重启服务 后即可使用。</span>
+        </div>
+      </div>`;
+      if (enableBtn) enableBtn.disabled = true;
+      if (restartBtn) restartBtn.disabled = true;
+      if (hint) hint.textContent = '';
+      return;
+    }
 
     const signature = JSON.stringify([info.ready, info.steps, info.kimi.running, info.kimi.pids.length]);
     if (signature === state.kimiSig) return;
